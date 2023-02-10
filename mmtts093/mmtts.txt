@@ -1,0 +1,33 @@
+プログラムの説明
+
+■名前
+mmtts.py 0.93
+
+
+■概要
+このプログラムは、MBROLAとMeCabを使って日本語文字列を音声に変換するPythonスクリプトおよびそのサポートプログラムです。
+WindowsXP/VISTA/7 および Ubuntu 9.10 で動作します。
+
+■ファイルの構成
+・mmtts.py
+・pho2wav.pyd
+・userdic.txt
+・pho2wav.cpp
+・mmtts.txt
+
+
+■Windowsでの利用
+Windows 用 MBROLAパッケージ、MeCabパッケージ、Python2.6、Python2.6用 Mecabモジュールをインストールします。
+そして、MBORLAサイトから日本語音素データベースのJP2ファイルをダウンロードし、mmtts.py、pho2wav.pyd、userdic.txtと同じ場所において、mmtts.pyで定義された関数を呼び出します。
+
+
+■Ubuntuでの利用
+synapticなどによって、MBROLAパッケージ、MeCabパッケージ、mecab-ipadic辞書パッケージ、libmecab-devパッケージ、Pythonパッケージをインストールします。そしてMeCabサイトからPythonのバージョンMeCabのバージョンに合った Python用MeCabモジュールをダウンロードし、セットアップします。そして、MBORLAサイトから日本語音素データベースのJP2ファイルをダウンロードし、mmtts.py、userdic.txtと同じ場所において、mmtts.pyで定義された関数を呼び出します。
+
+
+■免責事項
+このプログラムを使う上での、あらゆる事態に対して作成者 takayan はその責任を負いません。
+
+
+最終更新日 2010/03/08
+以上です。

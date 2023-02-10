@@ -1,0 +1,829 @@
+========================================================================
+【ソフトの名前】mbtts
+【バージョン　】Version 0.97.6
+【著作権　　　】takayan
+【開発言語　　】python2.6
+【動作環境　　】Windows7/VISTA/XP、Ubuu10.4,、MacOSX v10.6
+【ホームページ】http://neu101.seesaa.net/
+========================================================================
+
+
+1 プログラムの説明
+
+1.1 名前
+mbtts.py 0.97.6
+
+1.2 概要
+これは、MBROLAとMeCabを使って日本語文字列を音声に変換するPythonパッケー
+ジです。
+WindowsXP/VISTA/7 および Ubuntu 9.10、MacOSX で動作します。
+
+1.3 ライセンス
+
+修正BSDライセンス
+
+Copyright(C) 2010, takayan. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+
+1.4 配布ファイルの構成
+
+mbtts.txt
+	... 説明（このファイル）
+setup.py
+	... パッケージインストール用スクリプト（Windows,Ubuntu,MacOSX共用）
+mbtts-0.97.6.win32-py2.6.exe
+	... Windows用パッケージインストール実行ファイル
+mbtts_postinst.py
+	... Windows用インストーラ実行後スクリプト
+mecab_mbtts_wrap.cxx
+	... 修正したmecab.hを元にSWIGで自動生成したラッパーモジュール
+open_jtalk.exe
+	... Open JTalkの実行ファイル
+copy_openjtalk.py
+	... open_jtalk.exeを所定の場所にコピーするスクリプト
+
+
+demo:
+	mbspeak.py
+		... コマンドライン用スクリプト
+	test.py
+		... jp1等に付属するPHOと同じ文章を読ませるスクリプト
+	readaloud.py
+		... テキストファイル text.txt を音読させるスクリプト
+	speechbox.py
+		... wxWidgets を使ったサンプル
+			実行にはwxPythonパッケージが必要です
+mbtts:
+	__init__.py         ... create関数の定義
+	mbtts_var.py        ... 大域変数処理
+	mbtts_player.py     ... 音声再生処理クラス定義
+	mebab_mbtts.py      ... 修正したmecab.hを元にSWIGで生成したモジュール
+	mecab_dic.py        ... MeCab辞書処理の基底クラス定義
+	mecab_ipadic.py     ... ipadic関連処理
+	mecab_unidic.py     ... unidic関連処理
+	tankanji.py         ... 単漢字詳細変換定義
+	mb_converter.py     ... MBROLA向け変換の基底クラス定義
+	mb_jp.py            ... jp1,jp2,jp3の上位クラス
+	mb_jp1.py           ... jp1関連処理
+	mb_jp2.py           ... jp2関連処理
+	mb_jp3.py           ... jp3関連処理
+	mb_aquestalk2.py    ... MBROLA向け変換の基底クラス定義
+	mb_openjtalk.py     ... MBROLA向け変換の基底クラス定義
+	userdic.txt         ... 簡易辞書サンプル
+
+
+2 インストール
+
+mbtts のインストールするには、前もっていくつかのパッケージのインストールが
+必要です。
+
+2.1 必要なパッケージのインストール
+
+このスクリプトを動かすには以下のパッケージが必要です。
+・MBROLAパッケージ
+・MeCabパッケージ
+・MeCab辞書 ipadic および Unidic
+・Python2.6本体
+・Python2.6用のpygameパッケージ
+・MBROLA日本語音素データベースjp1,jp2,jp3の少なくとも一つ
+
+必要なファイルのインストールはWindows、Ubuntu、MacOSXで異なります。
+
+
+2.1.1 共通の手順
+
+MBROLAサイト http://tcts.fpms.ac.be/synthesis/mbrola.html から日本語音素
+データベースのファイル jp1-000314.zip,jp2-270202.zip,jp3.zipをダウンロー
+ドしてきます。そしてそれぞれを展開し、フォルダーを丸ごと上記の .mbtts フ
+ォルダーの中にコピーします。
+
+
+2.1.2 Windowsでの手順
+
+・mbrola.exe のコピー
+http://tcts.fpms.ac.be/synthesis/mbrola.html からDOS版 mbrola パッケージ
+をダウンロードし、展開します。中のmbrola.exe を .mbtts 内にコピーします
+。
+
+・Python2.6本体のインストール
+http://www.python.org/ からWindows用 python2.6本体をダウンロードし、イン
+ストールします。
+
+・MeCabパッケージのインストール
+http://mecab.sourceforge.net/ からWindows用MeCabパッケージをダウンロード
+し、インストールします。
+
+このMeCabパッケージをインストールするとき文字コードの選択画面があります
+。通常はSJISを選んでください。既に他のソフトで利用していて、その兼ね合い
+でSJISにできないときは、.mbttsフォルダ内の config.txt のMECAB_CHARSETの
+値をその文字コードの値に書き換えて対応します。config.txtは初回起動後に生
+成されます。なお mecab 文字コードの utf-16 には対応していません。
+
+・pygame パッケージのインストール
+http://www.pygame.org/ からWindows向けPython2.6用パッケージをダウンロー
+ドし、インストールします。
+今回、音声の非同期再生の実現のためにpygameのmixerモジュール(SDL_mixer)を
+使っています。
+
+・Unidic のインストール
+WindowsのMeCabパッケージにはipadicが標準で入っています。そのためMeCabパ
+ッケージを入れただけでもmbttsは動作します。しかしアクセント情報が利用で
+きるUnidicのインストールもお勧めします。これがあると、完全ではありません
+が日本語を抑揚をつけて発音してくれるようになります。
+
+UniDicサイトhttps://www.tokuteicorpus.jp/dist/index.phpで会員登録して、
+	unidic-mecab1312_sjis.zip
+	unidic-mecab1312_utf8.tar.gz
+	unidic-mecab1312_eucj.tar.gz
+これら3つのうちMeCabパッケージをインストールしたときの文字コードのものを
+選んでダウンロードします。そして ipadic のフォルダーが置かれている隣に展
+開します。このとき、eucj以外は、unidic-utf8、unidic-sjisなど文字コードを
+分かりやすくするためにハイフンで繋いで文字コードを付けた名前にしてもかま
+いません。
+
+・wxPythonパッケージのインストール
+デモスクリプトの中には、wxPython を使ったものも用意しています。動作に必
+須なパッケージではありませんが、このスクリプトの動作を確認するためには、
+wxPythonサイト http://www.wxpython.org/ でUnicode版をダウンロードし、イ
+ンストールしてください。
+
+
+2.1.3 Ubuntuでの手順
+
+・パッケージ管理システムによるインストール
+apt-getやSynaptic などのパッケージ管理ソフトを使って、MBROLA、mecab、mec
+ab-ipadic、pygame のパッケージをインストールします。このときインストール
+されるMeCab辞書はeuc-jp文字コードのものです。UTF-8版辞書が欲しいときはそ
+のパッケージmecab-ipadic-utf8もインストールしておきます。また、あとでMeC
+abのPythonバインディングファイルをインストールするのですが、そのとき m
+ecab のヘッダファイルが必要になるので、この段階で libmecab-dev もインス
+トールしておきます。Pythonが入ってないときはPython2.6も入れておきます。
+
+コマンドラインで示すとこうなります。
+
+	sudo apt-get install mbrola
+	sudo apt-get install mecab
+	sudo apt-get install mecab-ipadic
+	sudo apt-get install libmecab-dev
+	sudo apt-get install python2.6
+	sudo apt-get install python-pygame
+
+これらのファイルは、パッケージからではなく、ソースからでもインストールで
+きるはずです（確認はしていませんが）。そのときはインストールされるフォル
+ダや文字コードなどの調整が必要になると思われます。そのときは、./mbtts/co
+nfig.txtの内容を書き換えるか、mbttsのスクリプトそのものを修正して対応し
+てください。mbrola に関してはソースが配布されていませんので、実行ファイ
+ルのアーカイブ mbr301h.zip をMBROLA サイトからダウンロードしてきて、該当
+するアーキテクチャーのファイルを mbrola にリネームして、.mtts フォルダー
+にコピーすれば動きます。
+
+パッケージからMeCabおよびMeCab辞書をインストールした場合、辞書の場所は /
+var/lib/mecab/dic/ になります。mbtts ではこのパスを前提にプログラムを書
+いています。こことは違う場所にインストールされている場合は、.mbtts/confi
+g.txtのmecab_dic_baseでその場所を指定してください。
+
+MeCabおよびMeCab辞書はソースから最新版をインストールすることもできますが
+、その場合は辞書のインストール先を configure で --with-dicdir=/var/lib/m
+ecab/dic/ipadic-utf8 などとしてUbuntuパッケージ版でインストールされる場
+所と同じ /var/lib/mecab/dic/*** に合わせるか、デフォルトでインストールさ
+れた場所を、mecab_ipadic.py の該当行に書き込むなりしなくては、mbttsスク
+リプトは正しく動きません。
+
+・Unidicのインストール
+ipadic辞書ではアクセント情報がありませんので、多少面倒ですが、Unidic の
+インストールもお勧めします。
+
+Unidic サイトに行き、ログインします。アカウントがなければ作ります。そし
+て、ダウンロードページに入り、個別ファイルのところから unidic-mecab1312_
+eucj.tar.gz か unidic-mecab1312_utf8.tar.gz をダウンロードします。どちら
+でもいいですが、先に入れた ipadic と同じ文字コードのほうをインストールし
+ます。両方入れてもかまいません。そのときはeuc-jp版のフォルダはunidic、ut
+f8版のフォルダは unidic-utf8という名前にします。
+
+ダウンロードしたら、
+
+	tar xvfz unidic-mecab1312_eucj.tar.gz
+	sudo cp -r unidic-mecab1312_eucj/ /var/lib/mecab/dic/unidic
+
+もしくは
+
+	tar xvfz unidic-mecab1312_utf8.tar.gz
+	sudo cp -r unidic-mecab1312_utf8/ /var/lib/mecab/dic/unidic-utf8
+
+で、MeCabの辞書フォルダにコピーします。MeCabの辞書フォルダが上記と違う場
+合は、適宜書き換えます。バージョンが進んでいる場合もファイル名を適宜書き
+換えます。
+
+
+2.1.4 MacOSX での手順
+
+MacOSXでは、既に搭載されているPythonのほか、MacPorts を使ったり、ソース
+をビルドしたり、いろいろなPython環境の構築の仕方があるようです。一例とし
+て今回動作が確認できた構築方法を書いておきます。今回の mbtts パッケージ
+はpygameパッケージに頼っていますので、これさえ入れられればほかの環境でも
+何とかなるはずです。ご自分の現在使っているPythonの環境にあわせて、pygame
+パッケージを導入してみてください。
+
+Python公式サイトより、python-2.6.4_macosx10.3.dmg をダウンロード後、マウ
+ント、そしてインストールします。
+同様に、pygameサイトより、pygame-1.9.1release-py2.6-macosx10.5.zip。
+同様にGUIソフト開発のために、wxPythonサイトより、wxPython2.8-osx-unicode
+-2.8.10.1-universal-py2.6.dmg。
+
+MeCabサイトより、次の2つのソースファイルをダウンロードします。
+mecab-0.98.tar.gz、mecab-ipadic-2.7.0-20070801.tar.gz
+
+最初の二つのアーカイブは展開後、ターミナルから次のコマンドで文字コードを
+UTF8に指定してインストールします。
+./configure --with-charset=utf8
+make
+sudo make install
+
+このとき辞書は次の場所にインストールされます。
+/usr/local/lib/mecab/dic/ipadic
+
+Unidicサイトよりunidic-mecab1312_utf8.tar.gzをダウンロードします。/usr/l
+ocal/lib/mecab/dic/unidic-utf8 に展開します。
+
+MBROLAサイトから macos.zip ファイルをダウンロードし展開します。そしてそ
+の中にある mbrola-darwin-ppc をさっきの .mbtts フォルダにコピーします。p
+pcと名前にありますが、Rosetta のおかげで Intel Mac でもちゃんと動きます
+。
+
+以上の方法で同梱のデモが動作しました。
+
+
+2.2 mbtts 本体のインストール
+
+Windowsの場合は、次の実行ファイルを実行してください。
+mbtts-0.97.win32.exe
+
+Ubuntu、MacOSXの場合は、コンソールを開きsetup.pyファイルのあるところで次
+のコマンドを実行してください。
+sudo python setup.py install
+
+なお、Windowsでもpython2.6へのパスが通っており、コンパイラがインストール
+されていれば、上記実行ファイルを使わずに、コマンドプロンプトからこのコマ
+ンドでインストール可能です。
+
+インストールの結果、Pyhtonのライブラリに mbtts が配置されます。
+また、このインストールのとき、専用の関連ファイル格納用フォルダとして、ホ
+ームディレクトリに .mbtts フォルダが作成されます。Windows7/VISTAでは、C:
+\Users\(ユーザー名)\.mbtts、WindowsXPだとC:\Documents and Settings\(ユー
+ザー名)\.mbtts、Ubuntu だと、/home/(ユーザー名)/.mbtts、MacOSXでは、/Use
+rs/(ユーザー名)/.mbtts です。隠しフォルダーになるので、コンソールから操
+作してください。
+
+.mmttsフォルダの中には、簡易辞書ファイル userdic.txt がコピーされます。
+単純な記号の置き換えなどMeCabの辞書では変換が難しい語句の変換などに使う
+ためのものです。
+
+この.mbttsフォルダには、あとで出てくる音素データベースファイルのフォルダ
+やmbrola実行ファイルなどをコピーします。
+
+
+2.3 ファイルの構成
+
+インストールされたPythonライブラリの mbttsフォルダには以下のファイルおよ
+びそのコンパイルされたファイルが含まれています。
+__init__.py
+mbtts_var.py
+mbtts_player.py
+mbtts_mbtts.py
+mecab_dic.py
+mecab_ipadic.py
+mecab_unidic.py
+tankanji.py
+mb_converter.py
+mb_jp1.py
+mb_jp2.py
+mb_jp3.py
+
+また、mbtts の外には
+_mecab_mbtts.pyd
+mecab_mbtts.py 
+
+そして、関連する eggファイルが作成されます。
+
+
+2.5 設定ファイルの説明
+
+mbttsではパラメータ省略時の値などをホームディレクトリの.mbtts内にあるcon
+fig.txtファイルで指定しています。
+
+Windowsでは初回起動時次の内容のUTF8文字コードのファイルが生成されます。
+[mbtts]
+mecab_charset = sjis
+dic_name = unidic
+database_name = jp2
+text_charset = sjis
+default_file = text.txt
+logfile_name = log.txt
+accent_flag = 1
+reading_symbol_flag = 0
+userdic_name = userdic.txt
+debug_flag = 0
+message_text = 世界のみなさん、こんにちは
+system_charset = sjis
+mecab_dic_base = 
+
+この値を書き換えることで、標準状態の動作を指定することができます。初期状
+態に戻したいときは、このファイルそのものを削除してください。毎回起動時に
+あるかどうか確認し、無い場合は初期設定の内容で自動的に生成されます。
+
+それぞれの変数の意味は次の通りです。
+
+mecab_charset        ：MeCab辞書の文字コード
+text_charset         ：テキストファイルの標準の文字コード
+system_charset       ：コンソールの入出力で使用される文字コード
+dic_name             ：標準で使用するMeCab辞書の名前
+database_name        ：標準で使用する日本語音素データベースの名前
+default_file         ：mbspeak.py で読み上げるファイルの場所
+message_text         ：mbspeak.py で読み上げるメッセージ
+logfile_name         ：.mbtts 内に残すログファイルの名前
+accent_flag          ：アクセントをつけるかどうか(1|0)
+reading_symbol_flag  ：無視記号を読むかどうか(1|0)
+userdic_name         ：.mbtts 内の簡易辞書の名前
+debug_flag           ：ログファイルを残すかどうか(1|0)
+mecab_dic_base       ：MeCabの辞書フォルダの場所。空欄のときは標準位置
+
+※辞書のパスには全角文字や空白文字を使えません。
+
+
+2.6 簡単なテスト
+
+コンソールでpythonを起動させ、対話モードから次のように入力します。
+端末によっては日本語を入力できないかもしれませんが、そのときは、
+読み上げ文字列にmecabとかpythonとか、打ち込んでみてください。
+
+>>> import mbtts
+>>> tts = mbtts.create()
+>>> tts.speak(u'あらゆる現実を、全て自分の方へ捻じ曲げたのだ。')
+
+※このように文字列はユニコード文字列で指定します。
+
+demoフォルダーにいくつかのデモ用のスクリプトも同梱しているので、それも試
+してください。
+
+
+mbtts.create()で返されるオブジェクトには下に説明するように他にもメソッド
+を定義してあります。これを使っていろんなスクリプトを書いてみてください。
+
+
+3 追加のインストール
+
+mbtts では MBROLA が標準の音声合成エンジンですが、追加で AquesTalk2、
+Open JTalkの二つの音声を利用することができます。
+
+3.1 AquesTalk2 のインストール
+
+アクエスト社のダウンロードページから、ライセンスを確認して、
+該当するプラットフォームのアーカイブをダウンロードします。
+
+http://www.a-quest.com/download/index.html
+
+
+ダウンロードした圧縮ファイルから dll を抽出し、設定フォルダ .mbtts の中
+の aquestalk2 フォルダ内にコピーします。
+
+DLLの名前は：
+Windows では AquesTalk2.dll
+Linuxは では libAquesTalk2.so.1.0
+OSX では AquesTalk2
+
+なお OSX の DLL はアーカイブの奥まったところにあります。場所は、
+aqtk2_mac_100201/AquesTalk2_Mac/AquesTalk2.framework/Versions/A、です。
+ 
+
+またアーカイブの中の声種フォルダ phont をまるごと、.mbtts の中の
+aquestalk2 フォルダにコピーすると、追加の音声を利用できるようになりま
+す。ダウンロードページにある追加の声種ファイルも、この phont フォルダ
+に入れると使えるようになります。aquestalk2フォルダ内に、声種のアーカイ
+ブをそのまま置いておけば、実行時にphont フォルダ内に展開されます。
+
+
+3.2 Open JTalk のインストール
+
+Open JTalk の実行ファイルを用意します。それにはソースをダウンロードして
+ビルドします。また Open JTalk はhts-engine-APIを利用しているので、その
+ソースもダウンロードして、ビルドします。
+
+hts-engine：
+http://sourceforge.net/projects/hts-engine/
+現時点の最新ファイルは、hts_engine_API-1.03.tar.gz です。
+
+open_jtalk:
+http://sourceforge.net/projects/open-jtalk/
+現時点の最新ファイルは、open_jtalk-1.01.tar.gz です。
+
+
+3.2.1 Ubuntu と OS X でのビルド手順
+
+ダウンロードしてきた二つのファイルが同じフォルダにおいてあるとします。
+以下のコマンドでビルドし、インストールします
+
+tar xvfz hts_engine_API-1.03.tar.gz
+cd hts_engine_API-1.03
+./configure
+make
+sudo make install
+cd ..
+tar xvfz open_jtalk-1.01.tar.gz
+cd open_jtalk-1.01.tar.gz
+./configure --with-charset=UTF-8
+make
+sudo make install
+
+mbtts では Open JTalk の文字セットを、設定フォルダの config.txt の
+OPENJTALK_CHARSET で指定できます。この変数を --with-charsetで指定したも
+のと同じ文字列にします。省略時は EUC-JP ではなく、UTF-8 と解釈されます。
+
+
+3.2.2 Windows 用の実行ファイル
+
+Windows版はビルド環境の構築など多少面倒なので、ビルド済みのものを
+用意しました。
+
+open_jtalk.exe は文字セットを UTF-8 にし、音声出力を無効化した 
+open_jtalk-1.01.tar.gz をVC++2008によるビルドしたものです。
+この open_jtalk.exe を設定フォルダ .mbtts の中の open_jtalk フォルダ
+の中にコピーします。copy_openjtalk.py をダブルクリックすれば、自動的
+にコピーされます。
+
+
+3.3 辞書と話者データのコピー
+
+Open JTalk には 辞書と話者データが必要です。次の場所からダウンロード
+してきます。このときOpen Jtalkのビルド時の文字セットに合わせた辞書を
+使います。mbtts の標準設定では EUC-JP ではなく、UTF-8 版です。
+
+http://sourceforge.net/projects/open-jtalk/files/
+
+
+それぞれの現時点での最新のアーカイブ名：
+辞書、open_jtalk_dic_utf_8-1.00.tar.gz
+話者、hts_voice_nitech_jp_atr503_m001-1.01.tar.gz
+
+
+辞書のバージョンが更新されたときは、.mbtts 内の config.txt の変数 
+openjtalk_dic_ver の値をフォルダ名に修正し対応します。音声ファイルの方
+は名前が変わった場合でも修正する必要はありません。
+
+Open JTalkの関連ファイルは設定フォルダ .mbtts の open_jtalk の中に入れ
+ます。このフォルダの中に辞書と話者のアーカイブをコピーすれば実行時に
+展開します。
+
+
+
+4 利用方法
+
+4.1 mbtts について
+
+利用するファイルの先頭で次のインポート文を記述することで、このパッケージ
+を利用できるようになります。
+
+import mbtts
+
+mbtts をインポートすると 次の関数が利用できるようになります。
+
+mbtts.create()
+
+これは、音声合成を操作するオブジェクトを返します。
+
+mbtts.create()で返されるものの正体はmbtts_player.MBTTSplayerクラスのコン
+ストラクタで作成されるオブジェクトです。このコンストラクタに渡される引数
+は音素データベース名、MeCab辞書名です。上記の例のように省略してもかまい
+ません。省略した場合は、.mbtts/config.txtのdatabase_name、dic_nameで指定
+されたものが使われます。
+
+現在、音素データベース名として、jp1,jp2,jp3が利用できます。ただし、上記
+の手順によって .mbtts フォルダ内にjp1,jp2,jp3のどれかがコピーされていな
+くてはなりません。またMeCab辞書としてipdicとunidicが使えます。ただし、こ
+れも上記手順によってコンピュータ内にインストールされている必要があります
+。
+
+そのほか、次の関数が利用できます。
+
+mbtts.default_database()
+標準のデータベース名を返します。
+
+mbtts.available_databases()
+現在利用可能なデータベース名のリストを返します。
+
+
+4.2 mbtts.create()が返すオブジェクトで利用できるメソッドのリスト
+
+mbtts_player.TTSplayerクラスのオブジェクトが作られると次のメソッドが利用
+できます。
+
+4.2.1 発声
+speak(string,sync=1,timing=1)
+speak_spell(string,sync=1,timing=1)
+speak_with_callback(self,string,start,finish,timing=1)
+speak_spell_with_callback(self,string,start,finish,timing=1)
+speak_file(filename,charset=None)
+※引数の意味は下で説明します。
+
+4.2.2 発声コントロール
+pause()
+resume()
+stop()
+
+4.2.3 発声確認
+until_finishing()
+is_speaking()
+
+4.2.4 WAVファイル生成
+speak_to_file(string,filename)
+speak_spell_to_file(string,filename)
+speak_lines_to_file(lines,filename)
+
+3.2.5 音素ファイル生成
+text_to_pho(string,filename)
+lines_to_pho(lines,filename)
+
+4.2.6 設定
+set_dic(name)
+set_volume(val)
+set_rate(val)
+set_pitch(val)
+set_accent_mode(mode)
+set_reading_mode(mode)
+set_text_charset(set)
+
+
+4.3 speakメソッド群の説明
+
+音声を出力するメソッドは以下のものがあります。
+
+speak(string,sync=1,timing=1)
+speak_spell(string,sync=1,timing=1)
+speak_with_callback(self,string,start,finish,timing=1)
+speak_spell_with_callback(self,string,start,finish,timing=1)
+speak_file(filename,charset=None)
+
+string:
+	発音する文字列。文字コードはユニコード
+
+同期/非同期:
+	0 ... asynchronous	非同期（再生終了を待たずに戻る）
+	1 ... synchronous	同期　（再生終了まで待つ）（省略時設定）
+
+発声タイミング :
+	0 ... 待って発声する	現在発声中の音声を続ける
+	1 ... 今すぐ発声する	現在発声中の音声を止める（省略時設定）
+	2 ... 今すぐ発声する	現在発声中の音声も続ける
+
+start/finish:
+	コールバック関数を指定します。
+
+filename:
+	出力先のファイル名です。Unicode文字列で指定します。
+
+・speak の利用法
+通常の利用では第1引数だけの形で使います。
+	obj.speak(u'こんにちは')
+
+これは、obj.speak(u'こんにちは',1,1) の省略形で、すぐに発音を開始し、発
+音が終わってから次の処理を行います。
+
+単純な利用の場合、この引数が一つだけの利用で十分ですが、長い文章を読ませ
+ている間に他の処理をさせたいときや、既に発音されている音声が終わるのを待
+ってから発声させたいときは、第2引数や、第3引数を設定し使用します。
+
+次の場合、今すぐ非同期再生が行われます。既に発声している音声がある場合は
+、先の音声は強制的に止められてしまいます。
+	obj.speak(u'こんにちは',0)
+
+非同期での発声では、stop(),pause(),resume()メソッドを利用して発音の停止
+、一時停止、再開などの操作が行えます。
+
+現在非同期で発音している音声を止めたくない場合は、次のような命令を書きま
+す。
+	obj.speak(u'こんにちは',1,0)
+
+この命令は、現在発音している音声が終わったあとに発声を始めます。これ自体
+が同期発声なので先に発音しているメッセージもこのメッセージも中断されるこ
+となく、発声されたあと制御が戻ってきます。
+
+speak 命令群は Speakerクラスの変数を戻り値として返します。正体はpygame.m
+ixerのchannelオブジェクトを含んだオブジェクトです。これは非同期命令のと
+きだけ意味を持ちます。この戻り値を使って、個別に発声を制御できます。この
+Speakerクラスのメソッドとして、stop()、pause()、resume()、is_speaking()
+、until_finishing()が定義されています。
+
+
+4.4 その他のメソッドの説明
+
+・pause()
+・resume()
+・stop()
+TTSPlayerで発声されている発声全体をコントロールします。先のSpeakerクラス
+は個別の発声をコントロールするものですが、これはTTSPlayerを使って発音さ
+れている音声全体をコントロールします。
+
+・until_finishing()
+・is_speaking()
+TTSPlayerで発声されている発声全体についての発音状況を調べます。until_fin
+ishing()は発音が終了するまで動作が停止します。is_speaking()は発音されて
+いるかどうかを論理値で返します。
+
+・speak_to_file(string,filename)
+・speak_spell_to_file(string,filename)
+・speak_lines_to_file(lines,filename)
+・txt_to_pho(string,filename)
+・lines_to_pho(lines,filename)
+文字列を変換してファイルに記録します。文字列もファイル名もUnicode文字列
+を使って指定します。名前にlinesを含むものは文字列リストを対象にするメソ
+ッドです。
+
+・set_dic(name)
+これはmecabで利用する辞書の名前を指定します。その辞書に合わせて変換処理
+を選択します。既に登録されている辞書のみ指定可能です。新しいMeCab辞書を
+使うときは、既にある辞書用のスクリプトに倣って新しくスクリプトを用意して
+ください。
+
+・set_volume(val)	0.0<=val<=1.0
+・set_rate(val) 	0.2<=val<=8.0
+・set_pitch(val)	0.2<=val<=8.0
+この三つのメソッドでは現在の値に掛ける比率を指定します。
+
+・set_accent_mode(mode)
+・set_reading_mode(mode)
+今後、単語にアクセントをつけるか、記号を読ませるかどうかを指定するメソッ
+ドです。1と0を使って指定します。
+
+・set_text_charset(set)
+今後読み込むテキストファイルの文字コードを指定します。UTF16以外の文字コ
+ードを指定してください。
+
+
+5 このプログラムが利用しているものについて
+
+5.1 MBROLAについて
+
+このスクリプトが利用しているMBROLAは、各言語のdiphone データベースを使っ
+て音声を合成するシステムです。
+
+公式サイト：
+http://tcts.fpms.ac.be/synthesis/mbrola/
+
+非軍用がはっきりと明記されている独特のライセンスで公開されています。
+http://tcts.fpms.ac.be/synthesis/mbrola/mbrlicen.html
+
+ソースは非公開ですが、ライセンスに同意すればホームページから無料でダウ
+ンロードし利用することができます。様々な言語、様々なプラットフォームに
+対応しています。
+
+
+5.2 MeCabについて
+
+このスクリプトで日本語の解析のために使っているMeCabというシステムが、
+工藤拓氏によって開発されている GPL, LGPL, または BSD のトリプルライセンス
+のフリーソフトウェアです。
+
+公式サイトは http://mecab.sourceforge.net/ です。
+
+このパッケージで使っているmecab_mbtts.pyとmecab_mbtts_wrap.cxxは、MeCab
+公式サイトで配布されているソースにあるmecab.iとmecab.hを修正し、それを元
+にSWIGを使って自動生成したファイルです。
+
+この配布パッケージのソースにはMeCabのソースそのものは使っていませんが、
+mecab_mbtts_wrap.cxxがコンパイルされてできるmecab_mbtts_wrap.pydはMeCabの
+ライブラリが使用されます。
+
+MeCabの利用に関しては、トリプルライセンスのうち以下のBSDライセンスを選択
+します。
+
+Copyright (c) 2001-2008, Taku Kudo
+Copyright (c) 2004-2008, Nippon Telegraph and Telephone Corporation
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are
+permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above
+   copyright notice, this list of conditions and the
+   following disclaimer.
+
+ * Redistributions in binary form must reproduce the above
+   copyright notice, this list of conditions and the
+   following disclaimer in the documentation and/or other
+   materials provided with the distribution.
+
+ * Neither the name of the Nippon Telegraph and Telegraph Corporation
+   nor the names of its contributors may be used to endorse or
+   promote products derived from this software without specific
+   prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+5.3 AquesTalk2について
+
+AquesTalk2は株式会社アクエストのテキスト音声合成ミドルウェアです。非営利
+の個人利用に限り、無償で使用できます。mbttsの設定フォルダにDLLを配置する
+ことで、この音声を利用することができるようになります。またphontフォルダ
+に声種ファイルを配置することで、標準以外の音声も利用できるようになります。
+
+アクエスト社ホームページの製品ページ
+http://www.a-quest.com/products/index.html
+
+
+5.4 Open JTalkについて
+
+Open JTalk は下記の修正BSDライセンスで配布されているオープンソースの日本語
+音声合成システムです。
+
+/* ----------------------------------------------------------------- */
+/*           The HMM-Based Speech Synthesis System (HTS)             */
+/*           Open JTalk developed by HTS Working Group               */
+/*           http://open-jtalk.sourceforge.net/                      */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/*  Copyright (c) 2008-2010  Nagoya Institute of Technology          */
+/*                           Department of Computer Science          */
+/*                                                                   */
+/* All rights reserved.                                              */
+/*                                                                   */
+/* Redistribution and use in source and binary forms, with or        */
+/* without modification, are permitted provided that the following   */
+/* conditions are met:                                               */
+/*                                                                   */
+/* - Redistributions of source code must retain the above copyright  */
+/*   notice, this list of conditions and the following disclaimer.   */
+/* - Redistributions in binary form must reproduce the above         */
+/*   copyright notice, this list of conditions and the following     */
+/*   disclaimer in the documentation and/or other materials provided */
+/*   with the distribution.                                          */
+/* - Neither the name of the HTS working group nor the names of its  */
+/*   contributors may be used to endorse or promote products derived */
+/*   from this software without specific prior written permission.   */
+/*                                                                   */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND            */
+/* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,       */
+/* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF          */
+/* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE          */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,          */
+/* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED   */
+/* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     */
+/* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   */
+/* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY    */
+/* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE           */
+/* POSSIBILITY OF SUCH DAMAGE.                                       */
+/* ----------------------------------------------------------------- */
+
+
+6 免責事項
+このプログラムを使う上での、あらゆる事態に対して作成者 takayan はその責
+任を負いません。
+
+
+7 更新履歴
+・2010/08/29　ver0.97.6
+OpenJTalkの標準文字コードをUTF-8にする。
+aquestalk2 の関連ファイルの格納場所を変更。
+・2010/08/27
+Open JTalkも使えるようにした。細かな設定はまだ未対応。
+・2010/08/23
+AquesTalk2も使えるようにした。細かな設定はまだ未対応。
+・2010/08/18
+数値の読み変換を刷新
+・2010/08/16
+インストール方法の修正
+英字文字列のローマ字読み対応
+
+初版 2010/03/25
+以上です。
